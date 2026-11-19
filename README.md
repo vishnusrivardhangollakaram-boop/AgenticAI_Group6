@@ -6,6 +6,8 @@ The two-workspace design draws on Student360. This project contains independent 
 
 ## Start the demo
 
+**Hosted demo:** [Open Placement Application Copilot](https://placement-copilot-group6.streamlit.app/). The published app was verified in Case simulation mode, including notice precedence and the officer decision. Live Dify requires a published workflow and server-side credentials.
+
 - **Fastest:** Open `demo/Placement_Copilot_Offline_Demo.html` directly in a browser. It shows precomputed synthetic evidence and the officer decision path. It needs no accounts, network, or Python.
 - **Interactive project:** Run Streamlit from the project folder with Python 3.11 or later. The default simulation is local and offers the complete case review.
 - **Live Dify:** Import the bundled workflow, select an available model, publish a new Dify application and set that application's key as a Streamlit server secret. Follow `workflow/README.md`.
@@ -51,4 +53,4 @@ On 14 scored synthetic cases, the fixed checklist, optimized rules, and adaptive
 - `docs/evaluation_method.md` and `docs/evaluation_offline.csv` describe test conditions and case results.
 - `docs/business-evidence.md` records market sources, pricing assumptions and deployment considerations.
 
-Before submission, add full names and roll numbers on slide 1. Enter an owner on each rubric slide, with every student named against at least one attribute. The main pitch leaves room inside the ten-minute time limit. Slides 12 and 13 are Q&A backups.
+Before submission, add full names and roll numbers on slide 1. Enter an owner on each rubric slide, with every student named against at least one attribute. The main pitch leaves room inside the ten-minute time limit. Slides 15 and 16 are Q&A backups.

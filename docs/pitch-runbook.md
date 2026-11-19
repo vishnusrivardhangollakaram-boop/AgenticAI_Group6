@@ -1,35 +1,39 @@
 # Placement Application Copilot presentation runbook
 
-The project brief allows **10 minutes for the pitch and 2 minutes for Q&A**. The core pitch runs **8:45**. Slides 12 and 13 support Q&A. The planned slots below leave **1:15** for handoffs, a slow run or navigation.
+The project brief allows **10 minutes for the pitch and 2 minutes for Q&A**. The core pitch runs **9:00** across slides 1–14. Slides 15 and 16 support Q&A. The planned slots leave **1:00** for handoffs or navigation.
 
 > Opening line: “I have 18 months of experience. The original job notice says 12 months, the update says 24, and the deadline is close. Which one do I trust?”
 
 The three demo roles use illustrative data. The prototype shows how an advisory system can give a student the current evidence and route an exception to the placement office. Applications and official decisions remain with the institution and employer.
 
-| Slide | Rubric attribute | Time | What to show | Owner |
+| Slide | Rubric attribute or role | Time | What to show | Owner |
 |---|---|---:|---|---|
-| 1 | Cover and speaker handoff | 0:20 | Establish the decision students face when a role changes while applications are open. | [Speaker name] |
-| 2 | Problem Solving | 0:35 | Follow one student from checking a notice to asking the office. Separate a documented industry workflow from unmeasured workload and adoption assumptions. | [Name] |
-| 3 | Innovation and Uniqueness | 1:30 | Show the current notice, the review-needed case, and the revised answer after an officer ruling. Cite the source at each decision. | [Name] |
-| 4 | Technical Feasibility | 0:55 | Show the live-mode design: the model selects permitted lookups, code checks authority and rules, and the officer resolves only the assigned exception. Explain the demo mode actually used. | [Name] |
-| 5 | Value Proposition | 0:55 | Report the actual synthetic results. Explain where the agent is useful and where a deterministic workflow already performs well. State what a campus pilot would measure. | [Name] |
-| 6 | Market Potential | 0:45 | Start with MBA/PGDM placement offices. Distinguish the published sector count, the initial prospecting target and the planned paid cohort. | [Name] |
-| 7 | Business Model | 0:45 | Present the campus licence as a testable price. Show the ₹54,000 delivery cost and ₹66,000 contribution under the model assumptions. | [Name] |
-| 8 | Competitive Landscape | 0:45 | Show the closest incumbent and the manual alternative. Position the product as an evidence and exception workflow beside the campus portal. | [Name] |
-| 9 | Scalability | 0:40 | Start with one round and one reviewer group. Explain campus boundaries, versioned imports, peak processing and release gates as proposed production work. | [Name] |
-| 10 | Data Privacy and Security | 0:40 | Show what the prototype actually protects and what changes in a real deployment: role access, limited fields, logs, retention and a manual fallback. | [Name] |
-| 11 | Regulatory Compliance | 0:55 | Identify final decision ownership, explain the approval path for real student data, and close with the proposed shadow pilot and decision criteria. | [Name] |
-| 12 | Appendix: Course concepts | Q&A | Map evidenced Agentic AI concepts to implementation choices. | [Optional owner] |
-| 13 | Appendix: Pilot design | Q&A | Defend the test design and the thresholds for expansion. | [Optional owner] |
+| 1 | Cover and speaker handoff | 0:20 | Establish the decision students face when a recruiter changes a published requirement. | [Speaker name] |
+| 2 | Problem Solving | 0:35 | One student has 18 months of experience. Show the original 12-month notice and the 24-month amendment, plus why the office may need to help. | [Name] |
+| 3 | Innovation and Uniqueness | 0:35 | Contrast separate notice searches and follow-ups with a single cited next step and an evidence-ready handoff. The campus portal remains the source of record. | [Name] |
+| 4 | Student workspace demo | 0:55 | Show all three outcomes for the same synthetic profile. Open the governing amendment and the unresolved equivalence case. | [Demo presenter] |
+| 5 | Technical Feasibility | 0:45 | Step through a bounded read-only tool loop, code-owned decisions, case replay and fallback. Name the runtime actually used. | [Name] |
+| 6 | Placement office handoff demo | 0:40 | Resolve only the capstone equivalence, record the evidence, and show the rest of the criteria being rechecked. | [Demo presenter] |
+| 7 | Value Proposition | 0:50 | Show 14/14 correct for each offline approach, lookup counts of 46/43/43 and zero unsupported ready outcomes. The adaptive simulation tied strong rules. A campus pilot would measure quality and active handling time. | [Name] |
+| 8 | Market Potential | 0:40 | Distinguish the published standalone PGDM institute count from the initial prospecting target and paid cohort scenario. Name the campus placement head as the buyer. | [Name] |
+| 9 | Business Model | 0:45 | Present ₹1.20 lakh licence, ₹54,000 annual delivery cost and ₹66,000 contribution as modelling assumptions. The time-saving threshold is a hypothesis. | [Name] |
+| 10 | Competitive Landscape | 0:40 | Show Superset, Handshake, Unstop and the manual campus workflow. Explain the proposed role beside the placement portal and the risk of incumbent parity. | [Name] |
+| 11 | Scalability | 0:35 | Show staged deployment from a synthetic cycle to a one-campus shadow pilot and multi-cycle rollout. Describe proposed scoping, peak queues and monitoring. | [Name] |
+| 12 | Data Privacy and Security | 0:40 | Distinguish synthetic, allowlisted workflow controls from real-pilot controls for identity, data minimization, access logging and retention. | [Name] |
+| 13 | Regulatory Compliance | 0:35 | Identify institutional and recruiter decision ownership, the correction route, and the data and authority checks for a real pilot. | [Name] |
+| 14 | Close and proposal | 0:25 | Ask for one authorized shadow pilot with 50 cases over four weeks. Explain how the team would decide whether to continue. | [Speaker name] |
+| 15 | Appendix: Course concepts | Q&A | Map Agentic AI concepts to verified project behavior and explain deliberate omissions. | [Optional owner] |
+| 16 | Appendix: Evaluation and pilot evidence | Q&A | Defend the test design, runtime evidence and thresholds for expansion. | [Optional owner] |
 
-## 90-second live demo
+## 95-second demo across slides 4 and 6
 
-1. **0:00–0:20 — Student shortlist.** Open the preflighted app and check the three roles. Point out Product Analyst’s result and the source and deadline format.
-2. **0:20–0:40 — Changed decision.** Open Business Analyst. Show the original 12-month notice and the 24-month governing amendment. The fictional student has 18 months. Say: “The result cites the amendment that changed it.”
-3. **0:40–1:10 — Ask the office.** Open AI Strategy Associate. The notice allows an analytics course *or equivalent*. The case lacks a binding equivalency ruling for the student’s capstone. Move to the office view and record the positive, case-specific ruling.
-4. **1:10–1:30 — Close the loop.** Return to the student view and show the updated decision and its evidence. Say: “The reviewer resolved the ambiguous clause. The rest of the criteria were checked again.”
+**Slide 4 (0:55).** Open the preflighted student workspace in the selected mode. Spend the first 15 seconds on the three-role shortlist and the cited Product Analyst result. Spend 20 seconds comparing Business Analyst's original 12-month notice and governing 24-month amendment against the student's 18 months. Use the remaining 20 seconds to show that AI Strategy Associate needs an analytics capstone or verified equivalent and that no decision is on file for this student's capstone.
 
-Use a clean browser session for each rehearsal. Confirm the example-run state before screen sharing. If a network or model dependency stalls, switch promptly to the offline mode or the prepared deck visuals. Name the mode out loud. A configured, imported or published workflow proves setup. A successful run with a captured trace proves the model executed that example.
+**Slide 5 (0:45, architecture explanation).** Trace that unresolved requirement through the permitted evidence lookups and authoritative rule check before moving to the office workspace.
+
+**Slide 6 (0:40).** Spend about 25 seconds selecting the pending AI Strategy Associate case and recording “Verify as equivalent” with an evidence note. Return to the student view in the final 15 seconds and show the updated decision. Say: “The officer resolved the ambiguous requirement. The workflow checked the rest of the criteria again.”
+
+Use a clean browser session for rehearsal. Confirm the example state before screen sharing. If the network or model stalls, switch to the checked offline demo or the deck visuals and name the mode. An imported or published workflow shows setup. A successful run with a captured trace shows model execution for that case.
 
 ## Short answers for Q&A
 

@@ -14,18 +14,20 @@ Copy the official spelling and roll number when the team provides them. Keep the
 | [Team member name] | [Roll number] | [Attribute] | [Role] |
 | [Additional member if applicable] | [Roll number] | [Attribute] | [Role] |
 
-| Slide | Attribute | Named owner to add to slide |
+| Slide | Assessed attribute | Named owner to add to slide |
 |---|---|---|
 | 2 | Problem Solving | [Full name] |
 | 3 | Innovation and Uniqueness | [Full name] |
-| 4 | Technical Feasibility | [Full name] |
-| 5 | Value Proposition | [Full name] |
-| 6 | Market Potential | [Full name] |
-| 7 | Business Model | [Full name] |
-| 8 | Competitive Landscape | [Full name] |
-| 9 | Scalability | [Full name] |
-| 10 | Data Privacy and Security | [Full name] |
-| 11 | Regulatory Compliance | [Full name] |
+| 5 | Technical Feasibility | [Full name] |
+| 7 | Value Proposition | [Full name] |
+| 8 | Market Potential | [Full name] |
+| 9 | Business Model | [Full name] |
+| 10 | Competitive Landscape | [Full name] |
+| 11 | Scalability | [Full name] |
+| 12 | Data Privacy and Security | [Full name] |
+| 13 | Regulatory Compliance | [Full name] |
+
+Slides 4 and 6 are demo slides. Slide 14 closes the pitch. Slides 15–16 support Q&A. Assign demo and backup presenters, and use the assessed slides above for the individual grading requirement.
 
 ## Final pass
 
@@ -33,8 +35,8 @@ Copy the official spelling and roll number when the team provides them. Keep the
 - [ ] Put each member’s actual name on at least one assessed slide. Cover every attribute in the deck.
 - [ ] Verify the deck opens on the presenting laptop. Use the standard font fallback and check projected readability.
 - [ ] Run the three-role story end to end, including the office ruling and the updated student result.
-- [ ] Rehearse with screen sharing and the person who will operate the demo. Time the core pitch to 8:45.
+- [ ] Rehearse with screen sharing and the person who will operate the demo. Time slides 1–14 to 9:00. Keep slides 15–16 for Q&A.
 - [ ] Verify the Dify model and endpoint if using live mode. Preserve a recent successful run trace. If live execution is unavailable, present the checked offline demo and identify the mode.
 - [ ] Keep Dify credentials outside the submission and source archive. Confirm screenshots and data are synthetic or authorized.
 - [ ] Reconcile all deck figures with the latest evaluation report. Check that synthetic measurements and market assumptions are clearly labelled.
-- [ ] Give the cost, adoption and privacy answers to the team members who own them. One backup presenter should know the complete 90-second demo.
+- [ ] Give the cost, adoption and privacy answers to the team members who own them. One backup presenter should know the complete 95-second demo across slides 4 and 6.
