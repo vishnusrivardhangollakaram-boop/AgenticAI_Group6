@@ -267,8 +267,9 @@ with tabs[0]:
                 format_func=lambda key: "All campus roles" if key == "all" else CASES[key]["role_title"],
             )
             modes = [OFFLINE, BASELINE] + ([LIVE] if api_key else [])
-            with st.expander("Run settings"):
-                mode = st.radio("Run mode", modes, index=2 if api_key else 0, key="selected_run_mode")
+            active_mode = state.get("selected_run_mode", OFFLINE)
+            with st.expander(f"Run settings · {active_mode}"):
+                mode = st.radio("Run mode", modes, key="selected_run_mode")
                 st.caption(MODE_DESCRIPTIONS[mode])
             if st.button("Check my shortlist", type="primary", width="stretch"):
                 latest = {}
