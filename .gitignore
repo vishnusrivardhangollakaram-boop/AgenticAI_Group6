@@ -1,0 +1,7 @@
+.streamlit/secrets.toml
+.env
+__pycache__/
+.venv/
+*.pyc
+.pytest_cache/
+*.sqlite*

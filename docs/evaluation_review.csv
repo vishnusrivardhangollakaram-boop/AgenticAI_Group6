@@ -1,0 +1,4 @@
+case,decision,expected,observed,verified_review_citation,trace_preserved,governing_notice_preserved,passed
+PC-103,equivalent,ready,ready,True,True,True,True
+PC-103,not_equivalent,not_ready,not_ready,True,True,True,True
+PC-103,request_evidence,missing_evidence,missing_evidence,True,True,True,True

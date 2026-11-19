@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>Placement Application Copilot · Offline demo</title>
+<style>
+:root{--paper:#fcfaf6;--white:#fff;--navy:#0e2836;--ink:#17323d;--muted:#52676c;--teal:#006a60;--mint:#deede7;--line:#dae4df;--rust:#9b4837;--gold:#80490f;--cream:#f6ead8;--radius:18px}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.55 Inter,"Segoe UI",system-ui,sans-serif}
+button,select{font:inherit}button{cursor:pointer}button:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid #258a81;outline-offset:4px}h1,h2,h3,p{margin:0}
+header{background:var(--navy);color:#fff;padding:44px 24px 48px}
+.frame{max-width:1160px;margin:auto}.head-top{display:flex;gap:15px;align-items:center;justify-content:space-between}
+.kicker{font-size:.72rem;letter-spacing:.14em;font-weight:750;text-transform:uppercase;color:#95d9cc}
+.offline{font-size:.75rem;color:#c8e4dd;border:1px solid #557675;border-radius:50px;padding:4px 12px}
+h1{margin-top:18px;font-size:clamp(2.45rem,5vw,4.6rem);line-height:1.02;letter-spacing:-.07em}
+.lead{color:#d7e5e3;font-size:1.1rem;margin-top:14px;max-width:650px}
+main{padding:27px 24px 48px}.layout{display:grid;grid-template-columns:262px minmax(0,1fr);gap:30px;align-items:start}
+aside{position:sticky;top:20px}.profile{padding:21px;background:var(--white);border:1px solid var(--line);border-radius:var(--radius)}
+.profile .kicker,.article-kicker{color:var(--teal)}.identity{font-size:1.5rem;line-height:1.15;margin-top:8px}.caption{font-size:.86rem;color:var(--muted)}
+.profile dl{margin:15px 0 0}.profile dl div{padding:10px 0;display:flex;justify-content:space-between;border-top:1px solid var(--line);gap:9px}.profile dt{color:var(--muted);font-size:.87rem}.profile dd{margin:0;text-align:right;font-size:.89rem;font-weight:700}
+nav{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:18px;padding-bottom:11px;border-bottom:1px solid var(--line)}
+.navset{display:flex;gap:6px}nav button{background:transparent;border:0;border-radius:30px;padding:8px 12px;color:var(--muted);font-weight:650;white-space:nowrap}
+nav button[aria-pressed="true"]{background:var(--mint);color:var(--teal)}nav .reset{font-size:.85rem;padding-right:0}
+h2{font-size:clamp(1.7rem,3.8vw,2.5rem);line-height:1.1;letter-spacing:-.045em}
+h3{font-size:1.18rem;line-height:1.24;letter-spacing:-.02em}
+.status{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:30px;font-size:.80rem;font-weight:700;line-height:1.25;color:var(--gold);background:var(--cream)}
+.status:before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor;flex:none}
+.status.ready{background:var(--mint);color:var(--teal)}.status.not_ready{background:#f4e2df;color:var(--rust)}
+.role-list{margin-top:15px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+.role{display:flex;flex-direction:column;align-items:flex-start;justify-content:space-between;text-align:left;background:var(--white);color:var(--ink);border:1px solid var(--line);border-radius:14px;padding:14px 12px;min-height:111px;gap:9px}
+.role:hover{border-color:#6da69b}.role[aria-pressed=true]{border:2px solid var(--teal);padding:13px 11px}.role strong{font-size:.98rem;line-height:1.26}.role small{display:block;color:var(--muted);font-size:.75rem;margin-top:2px}
+.card{border:1px solid var(--line);background:var(--white);margin-top:17px;border-radius:var(--radius);padding:24px}
+.result-head{display:flex;gap:10px;align-items:flex-start;justify-content:space-between;margin-top:3px}.result-head h3{font-size:1.71rem}.summary{margin:11px 0;color:var(--ink)}
+.next{margin:12px 0 15px;border-left:3px solid var(--teal);padding:6px 0 7px 11px;font-size:.94rem}.next b{display:block}
+.source{border-top:1px solid var(--line);padding:12px 0}.source:last-child{padding-bottom:0}.source .meta{text-transform:uppercase;font-weight:780;letter-spacing:.06em;color:var(--teal);font-size:.68rem}.source.archived .meta{color:var(--muted)}.source p{font-size:.89rem;margin-top:3px}.source.archived p{color:var(--muted)}
+details{border-top:1px solid var(--line);margin-top:15px;padding-top:11px}summary{cursor:pointer;font-weight:750;color:var(--teal)}
+.trace{padding:0 0 0 22px}.trace li{margin:9px 0;font-size:.9rem}.trace span{display:block;color:var(--muted)}
+.callout{margin-top:15px;background:var(--mint);padding:13px 14px;border-radius:12px;font-size:.92rem}.callout.pale{background:#eef2ee;color:var(--muted)}
+.primary{background:var(--teal);color:#fff;border:1px solid var(--teal);border-radius:11px;padding:10px 14px;font-weight:700;display:inline-block;line-height:1.35;margin-top:12px}
+.primary:hover{background:#004f47}.secondary{background:var(--white);color:var(--teal);border:1px solid var(--line);border-radius:11px;padding:9px 13px;font-weight:700}
+.review-select{display:block;margin-top:14px;font-weight:700}.review-select select{display:block;width:min(100%,460px);margin-top:5px;padding:8px 10px;border:1px solid #91aaa4;border-radius:8px;background:var(--paper);color:var(--navy)}
+.form-actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:13px}.form-actions .primary{margin-top:0}
+.focus{border-radius:13px;padding:14px;margin-top:16px;background:#f2f6f1}.focus p{margin:4px 0;color:var(--muted);font-size:.94rem}
+footer{margin-top:24px;padding-top:12px;border-top:1px solid var(--line);color:var(--muted);font-size:.82rem}
+[hidden]{display:none!important}
+@media(max-width:900px){.layout{grid-template-columns:210px minmax(0,1fr);gap:16px}.role-list{grid-template-columns:1fr}.role{min-height:auto;flex-direction:row}.card{padding:18px}}
+@media(max-width:690px){header{padding:30px 16px 33px}main{padding:17px 16px 28px}.layout{display:flex;flex-direction:column;gap:14px}aside{position:static;width:100%}.profile{padding:12px 14px}.profile dl{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px}.profile dl div{gap:5px;padding:0;border:0}.profile dt,.profile dd{font-size:.79rem}.result-head{flex-wrap:wrap}.work{width:100%}.head-top{flex-wrap:wrap}}
+@media(prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+</style>
+</head>
+<body>
+<header>
+  <div class="frame">
+    <div class="head-top"><span class="kicker">Campus careers · Placement desk</span><span class="offline">Offline classroom walkthrough</span></div>
+    <h1>Placement Application Copilot</h1>
+    <p class="lead">Check campus roles, follow the governing notice, and see what happens after an officer reviews an exception.</p>
+  </div>
+</header>
+<main class="frame">
+  <div class="layout">
+    <aside aria-label="Synthetic student profile">
+      <div class="profile" id="profile"></div>
+      <div class="callout pale"><strong>Presenting this demo?</strong><br>Compare the Business Analyst notices, then review the AI Strategy Associate case.</div>
+    </aside>
+    <section class="work" aria-label="Placement Copilot walkthrough">
+      <nav aria-label="Workspaces">
+        <div class="navset">
+          <button type="button" id="nav-student" aria-pressed="true">Student workspace</button>
+          <button type="button" id="nav-office" aria-pressed="false">Placement office</button>
+        </div>
+        <button type="button" id="reset" class="reset">Reset demo</button>
+      </nav>
+      <section id="student">
+        <span class="kicker article-kicker">Application checks</span>
+        <h2>Your shortlist</h2><p class="caption">Select a role to see its evidence and next action.</p>
+        <div class="role-list" id="roles" role="group" aria-label="Roles"></div>
+        <div class="card" id="assessment"></div>
+      </section>
+      <section id="office" hidden></section>
+      <div id="announcement" aria-live="polite" class="caption"></div>
+      <footer>The records are fictional. Results are precomputed replays from the local placement engine. This file makes no model or network calls.</footer>
+    </section>
+  </div>
+</main>
+<script type="application/json" id="snapshot-data">{"profile": {"student_id": "STU-001", "student_name": "Asha Rao", "cgpa": 7.6, "cgpa_scale": 10, "experience_months": 18, "capstone": "Applied AI Lab", "capstone_credits": 4, "identity_scope": "verified"}, "asOf": "2026-11-19T09:30:00+05:30", "cases": [{"id": "PC-101", "title": "Product Analyst", "employer": "Mosaic Metrics", "outcome": "ready", "summary": "The verified profile meets the applicable requirements in the governing notice.", "deadline": "26 Nov 2026, 18:00 IST", "nextAction": "Review the notice and apply through the official placement portal before the stated deadline.", "review": null, "citations": [{"id": "PL-PA-01", "title": "Product Analyst notice", "revision": 1, "status": "governing", "text": "CGPA ≥ 7/10. Experience ≥ 12 months. Deadline 26 Nov 2026, 18:00 IST."}], "trace": [{"action": "read_notice", "status": "base_notice", "accepted": true, "detail": "PL-PA-01 states a 12-month experience minimum.", "label": "Read base role notice"}, {"action": "find_amendments", "status": "current", "accepted": true, "detail": "PL-PA-01 governs. Minimum experience: 12 months.", "label": "Check official amendments"}, {"action": "read_profile", "status": "verified", "accepted": true, "detail": "Verified STU-001: 7.6 CGPA, 18 months of experience.", "label": "Read candidate profile"}]}, {"id": "PC-102", "title": "Business Analyst", "employer": "CedarBridge Advisory", "outcome": "not_ready", "summary": "The governing notice requires 24 months of experience. The profile records 18 months.", "deadline": "27 Nov 2026, 18:00 IST", "nextAction": "Check the cited criterion before using an application slot.", "review": null, "citations": [{"id": "PL-BA-01", "title": "Business Analyst notice", "revision": 1, "status": "superseded", "text": "CGPA ≥ 7/10. Experience ≥ 12 months. Deadline 27 Nov 2026, 18:00 IST."}, {"id": "PL-BA-02", "title": "Business Analyst notice", "revision": 2, "status": "governing", "text": "CGPA ≥ 7/10. Experience ≥ 24 months. Deadline 27 Nov 2026, 18:00 IST."}], "trace": [{"action": "read_notice", "status": "base_notice", "accepted": true, "detail": "PL-BA-01 states a 12-month experience minimum.", "label": "Read base role notice"}, {"action": "find_amendments", "status": "amended", "accepted": true, "detail": "PL-BA-02 governs. Minimum experience: 24 months.", "label": "Check official amendments"}, {"action": "read_profile", "status": "verified", "accepted": true, "detail": "Verified STU-001: 7.6 CGPA, 18 months of experience.", "label": "Read candidate profile"}]}, {"id": "PC-103", "title": "AI Strategy Associate", "employer": "FableAxis Consulting", "outcome": "needs_review", "summary": "The register does not map Applied AI Lab to AI Strategy Practicum. An officer must verify equivalence.", "deadline": "28 Nov 2026, 18:00 IST", "nextAction": "Send the cited discrepancy to the placement office.", "review": null, "citations": [{"id": "PL-AI-01", "title": "AI Strategy Associate notice", "revision": 1, "status": "governing", "text": "CGPA ≥ 7.5/10. Experience ≥ 15 months. Deadline 28 Nov 2026, 18:00 IST. A AI Strategy Practicum capstone or verified equivalent is required."}, {"id": "PL-EQ-01", "title": "Academic equivalence register", "revision": 1, "status": "unlisted", "text": "Applied AI Lab is unlisted for AI Strategy Practicum. Placement Office verification is required."}], "trace": [{"action": "read_notice", "status": "base_notice", "accepted": true, "detail": "PL-AI-01 states a 15-month experience minimum.", "label": "Read base role notice"}, {"action": "find_amendments", "status": "current", "accepted": true, "detail": "PL-AI-01 governs. Minimum experience: 15 months.", "label": "Check official amendments"}, {"action": "read_profile", "status": "verified", "accepted": true, "detail": "Verified STU-001: 7.6 CGPA, 18 months of experience.", "label": "Read candidate profile"}, {"action": "verify_equivalence", "status": "unlisted", "accepted": true, "detail": "Applied AI Lab is unlisted for AI Strategy Practicum. Placement Office verification is required.", "label": "Check capstone equivalence"}]}], "reviewCase": "PC-103", "reviewResults": {"equivalent": {"id": "PC-103", "title": "AI Strategy Associate", "employer": "FableAxis Consulting", "outcome": "ready", "summary": "The other requirements are met and the capstone equivalence is verified.", "deadline": "28 Nov 2026, 18:00 IST", "nextAction": "Review the notice and apply through the official placement portal before the stated deadline.", "review": {"decision": "equivalent", "label": "Confirm documented equivalence", "note": "Reviewed the signed academic record and confirmed that Applied AI Lab is equivalent to AI Strategy Practicum for this role."}, "citations": [{"id": "PL-AI-01", "title": "AI Strategy Associate notice", "revision": 1, "status": "governing", "text": "CGPA ≥ 7.5/10. Experience ≥ 15 months. Deadline 28 Nov 2026, 18:00 IST. A AI Strategy Practicum capstone or verified equivalent is required."}, {"id": "PL-EQ-01", "title": "Academic equivalence register", "revision": 1, "status": "unlisted", "text": "Applied AI Lab is unlisted for AI Strategy Practicum. Placement Office verification is required."}, {"id": "PLACEMENT-REVIEW", "title": "Officer decision", "revision": 1, "status": "equivalent", "text": "Reviewed the signed academic record and confirmed that Applied AI Lab is equivalent to AI Strategy Practicum for this role."}], "trace": [{"action": "read_notice", "status": "base_notice", "accepted": true, "detail": "PL-AI-01 states a 15-month experience minimum.", "label": "Read base role notice"}, {"action": "find_amendments", "status": "current", "accepted": true, "detail": "PL-AI-01 governs. Minimum experience: 15 months.", "label": "Check official amendments"}, {"action": "read_profile", "status": "verified", "accepted": true, "detail": "Verified STU-001: 7.6 CGPA, 18 months of experience.", "label": "Read candidate profile"}, {"action": "verify_equivalence", "status": "unlisted", "accepted": true, "detail": "Applied AI Lab is unlisted for AI Strategy Practicum. Placement Office verification is required.", "label": "Check capstone equivalence"}]}, "not_equivalent": {"id": "PC-103", "title": "AI Strategy Associate", "employer": "FableAxis Consulting", "outcome": "not_ready", "summary": "The recorded capstone does not meet the role’s verified equivalence requirement.", "deadline": "28 Nov 2026, 18:00 IST", "nextAction": "Check the cited criterion before using an application slot.", "review": {"decision": "not_equivalent", "label": "Record that equivalence is unconfirmed", "note": "The supplied course record does not establish equivalence to AI Strategy Practicum for this role."}, "citations": [{"id": "PL-AI-01", "title": "AI Strategy Associate notice", "revision": 1, "status": "governing", "text": "CGPA ≥ 7.5/10. Experience ≥ 15 months. Deadline 28 Nov 2026, 18:00 IST. A AI Strategy Practicum capstone or verified equivalent is required."}, {"id": "PL-EQ-01", "title": "Academic equivalence register", "revision": 1, "status": "unlisted", "text": "Applied AI Lab is unlisted for AI Strategy Practicum. Placement Office verification is required."}, {"id": "PLACEMENT-REVIEW", "title": "Officer decision", "revision": 1, "status": "not_equivalent", "text": "The supplied course record does not establish equivalence to AI Strategy Practicum for this role."}], "trace": [{"action": "read_notice", "status": "base_notice", "accepted": true, "detail": "PL-AI-01 states a 15-month experience minimum.", "label": "Read base role notice"}, {"action": "find_amendments", "status": "current", "accepted": true, "detail": "PL-AI-01 governs. Minimum experience: 15 months.", "label": "Check official amendments"}, {"action": "read_profile", "status": "verified", "accepted": true, "detail": "Verified STU-001: 7.6 CGPA, 18 months of experience.", "label": "Read candidate profile"}, {"action": "verify_equivalence", "status": "unlisted", "accepted": true, "detail": "Applied AI Lab is unlisted for AI Strategy Practicum. Placement Office verification is required.", "label": "Check capstone equivalence"}]}, "request_evidence": {"id": "PC-103", "title": "AI Strategy Associate", "employer": "FableAxis Consulting", "outcome": "missing_evidence", "summary": "The officer requested additional evidence before deciding equivalence.", "deadline": "28 Nov 2026, 18:00 IST", "nextAction": "Supply or verify the missing record through the placement office.", "review": {"decision": "request_evidence", "label": "Request more evidence", "note": "Please attach the signed capstone record and approved mapping for this role."}, "citations": [{"id": "PL-AI-01", "title": "AI Strategy Associate notice", "revision": 1, "status": "governing", "text": "CGPA ≥ 7.5/10. Experience ≥ 15 months. Deadline 28 Nov 2026, 18:00 IST. A AI Strategy Practicum capstone or verified equivalent is required."}, {"id": "PL-EQ-01", "title": "Academic equivalence register", "revision": 1, "status": "unlisted", "text": "Applied AI Lab is unlisted for AI Strategy Practicum. Placement Office verification is required."}, {"id": "PLACEMENT-REVIEW", "title": "Officer decision", "revision": 1, "status": "request_evidence", "text": "Please attach the signed capstone record and approved mapping for this role."}], "trace": [{"action": "read_notice", "status": "base_notice", "accepted": true, "detail": "PL-AI-01 states a 15-month experience minimum.", "label": "Read base role notice"}, {"action": "find_amendments", "status": "current", "accepted": true, "detail": "PL-AI-01 governs. Minimum experience: 15 months.", "label": "Check official amendments"}, {"action": "read_profile", "status": "verified", "accepted": true, "detail": "Verified STU-001: 7.6 CGPA, 18 months of experience.", "label": "Read candidate profile"}, {"action": "verify_equivalence", "status": "unlisted", "accepted": true, "detail": "Applied AI Lab is unlisted for AI Strategy Practicum. Placement Office verification is required.", "label": "Check capstone equivalence"}]}}}</script>
+<script>
+"use strict";
+const data=JSON.parse(document.getElementById("snapshot-data").textContent);
+const lookup=id=>document.getElementById(id);
+const student=lookup("student"), office=lookup("office"), roleList=lookup("roles");
+const statusText={ready:"Ready to apply",not_ready:"Does not meet notice",needs_review:"Office review needed",missing_evidence:"Evidence needed",closed:"Application closed",incomplete:"Check incomplete"};
+const statusNames={governing:"Governing source",superseded:"Superseded source",unchecked:"Unchecked",conflicting:"Conflicting",unlisted:"Unlisted",accepted:"Accepted",rejected:"Rejected",equivalent:"Equivalence confirmed",not_equivalent:"Equivalence unconfirmed",request_evidence:"More evidence requested"};
+const state={tab:"student",active:data.cases[0].id,decision:null};
+
+function element(tag,text,klass){
+  const item=document.createElement(tag);
+  if(text!==null && text!==undefined) item.textContent=text;
+  if(klass) item.className=klass;
+  return item;
+}
+function badge(outcome){return element("span",statusText[outcome]||"Status pending",`status ${outcome}`);}
+function button(text,klass,action){
+  const control=element("button",text,klass);
+  control.type="button";
+  control.addEventListener("click",action);
+  return control;
+}
+function caseFor(id){
+  return id===data.reviewCase && state.decision ? data.reviewResults[state.decision] : data.cases.find(row=>row.id===id);
+}
+function metaSource(source){
+  const block=element("div",null,`source ${source.status==="superseded"?"archived":""}`);
+  block.append(element("div",`${source.id} · v${source.revision} · ${statusNames[source.status]||source.status}`,"meta"),
+               element("strong",source.title),element("p",source.text));
+  return block;
+}
+function detailSummary(text){
+  const box=element("details");
+  box.append(element("summary",text));
+  return box;
+}
+function renderProfile(){
+  const p=data.profile, region=lookup("profile"), facts=element("dl");
+  region.append(element("div","Synthetic profile","kicker"),element("h3",p.student_name,"identity"),
+                element("p","Sample MBA candidate","caption"));
+  for(const [label,value] of [["CGPA",`${p.cgpa} / ${p.cgpa_scale}`],["Experience",`${p.experience_months} months`],["Capstone",p.capstone]]){
+    const pair=element("div");
+    pair.append(element("dt",label),element("dd",value));
+    facts.append(pair);
+  }
+  region.append(facts);
+}
+function renderStudent(restoreFocus){
+  roleList.replaceChildren();
+  for(const given of data.cases){
+    const row=caseFor(given.id);
+    const control=button(null,"role",()=>{state.active=row.id;renderStudent(true);});
+    const label=element("div");
+    label.append(element("strong",row.title),element("small",row.employer));
+    control.append(label,badge(row.outcome));
+    control.id=`role-${row.id}`;
+    control.setAttribute("aria-pressed",String(state.active===row.id));
+    roleList.append(control);
+  }
+  const row=caseFor(state.active), card=lookup("assessment");
+  const heading=element("div",null,"result-head");
+  heading.append(element("h3",row.title),badge(row.outcome));
+  const next=element("div",null,"next");
+  next.append(element("b","Next action"),element("div",row.nextAction));
+  card.replaceChildren(element("div",`${row.id} / Role assessment`,"kicker article-kicker"),heading,
+    element("p",row.summary,"summary"),next);
+  if(row.deadline) card.append(element("p",`Deadline · ${row.deadline}`,"caption"));
+  if(row.review) card.append(element("p",`Officer record · ${row.review.note}`,"callout"));
+  const sources=detailSummary("Notice citations and revisions");
+  sources.open=true;
+  row.citations.forEach(source=>sources.append(metaSource(source)));
+  card.append(sources);
+  const trace=detailSummary("Investigation trace"), events=element("ol",null,"trace");
+  for(const event of row.trace){
+    const item=element("li",event.label);
+    item.append(element("span",event.detail));
+    events.append(item);
+  }
+  trace.append(events);
+  card.append(trace);
+  if(row.outcome==="needs_review"){
+    card.append(button("Open case in placement office","primary",()=>changeTab("office",true)));
+  }
+  if(restoreFocus) lookup(`role-${row.id}`).focus();
+}
+function renderOffice(){
+  const original=data.cases.find(row=>row.id===data.reviewCase);
+  const resolved=caseFor(data.reviewCase);
+  const card=element("div",null,"card");
+  card.append(element("div",`${resolved.id} / Academic equivalence`,"kicker article-kicker"));
+  const head=element("div",null,"result-head");
+  head.append(element("h3",resolved.title),badge(resolved.outcome));
+  card.append(head,element("p",original.summary,"summary"));
+  const focus=element("div",null,"focus");
+  focus.append(element("strong","Decision needed"),
+    element("p","Does Applied AI Lab satisfy the AI Strategy Practicum requirement for this role?"));
+  card.append(focus);
+  const sources=detailSummary("Evidence sent to the officer");
+  original.citations.forEach(source=>sources.append(metaSource(source)));
+  card.append(sources);
+  if(state.decision){
+    card.append(element("p",`Recorded: ${resolved.review.note}`,"callout"),
+      button("See updated student shortlist","primary",()=>{state.active=data.reviewCase;changeTab("student",true);}));
+  } else {
+    const form=element("form");
+    const label=element("label","Officer decision","review-select");
+    const select=element("select");
+    select.id="decision";
+    for(const [value,labelText] of [["equivalent","Confirm equivalence"],["not_equivalent","Record that equivalence is unconfirmed"],["request_evidence","Request more evidence"]]){
+      const opt=element("option",labelText);
+      opt.value=value;
+      select.append(opt);
+    }
+    label.append(select);
+    const actions=element("div",null,"form-actions"), save=element("button","Record and recheck","primary");
+    save.type="submit";
+    actions.append(save);
+    form.append(label,actions);
+    form.addEventListener("submit",event=>{
+      event.preventDefault();
+      state.decision=select.value;
+      render();
+      lookup("announcement").textContent=`Review recorded. Student status: ${statusText[caseFor(data.reviewCase).outcome]}.`;
+      office.querySelector("button.primary").focus();
+    });
+    card.append(form);
+  }
+  office.replaceChildren(element("span","Review inbox","kicker article-kicker"),element("h2","Placement office"),
+    element("p","An officer decision can change the student’s next action.","caption"),card);
+}
+function changeTab(tab,focus){
+  state.tab=tab;render();
+  if(focus) lookup(`nav-${tab}`).focus();
+}
+function render(){
+  student.hidden=state.tab!=="student";office.hidden=state.tab!=="office";
+  for(const tab of ["student","office"]) lookup(`nav-${tab}`).setAttribute("aria-pressed",String(state.tab===tab));
+  renderStudent(false);renderOffice();
+}
+renderProfile();
+lookup("nav-student").onclick=()=>changeTab("student",false);
+lookup("nav-office").onclick=()=>changeTab("office",false);
+lookup("reset").onclick=()=>{
+  state.active=data.cases[0].id;
+  state.decision=null;
+  lookup("announcement").textContent="Demo reset.";
+  changeTab("student",true);
+};
+render();
+</script>
+</body>
+</html>
