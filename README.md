@@ -46,7 +46,7 @@ On 14 scored synthetic cases, the fixed checklist, optimized rules, and adaptive
 
 ## Submission material
 
-- `Placement_Application_Copilot_Final_Pitch.pptx` holds editable slides and presenter notes.
+- The submission bundle includes `presentation/AgenticAI_Group6_Placement_Copilot.pptx`, the editable deck with presenter notes.
 - `docs/pitch-runbook.md` holds the timed pitch, demonstration handoff and Q&A preparation.
 - `docs/course-concepts.md` maps the implemented concepts and concepts left outside scope to course pages.
 - `docs/architecture.md` describes evidence handling and the application boundary.
