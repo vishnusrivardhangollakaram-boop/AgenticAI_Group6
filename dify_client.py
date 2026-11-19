@@ -15,7 +15,8 @@ DEFAULT_BASE_URL = "https://api.dify.ai/v1"
 MAX_RESPONSE_BYTES = 1_000_000
 MAX_STREAM_BYTES = 8_000_000
 READ_TIMEOUT_SECONDS = 35
-RUN_TIMEOUT_SECONDS = 120
+# Dify Cloud can keep an active stream open while model calls queue.
+RUN_TIMEOUT_SECONDS = 240
 RESULT_OUTPUT_NAMES = ("result_json", *(f"result_json_{i}" for i in range(2, MAX_ROUNDS + 1)))
 
 
@@ -91,6 +92,8 @@ def _read_workflow_stream(response, deadline):
             return {"workflow_run_id": run_id, "data": event.get("data")}
         if event.get("event") == "error":
             raise ValueError("Dify stopped the workflow with an error. Check its run logs.")
+    if perf_counter() > deadline:
+        raise ValueError("The Dify workflow exceeded the four-minute wait for this role. Try one role or use Case simulation.")
     raise ValueError("Dify's stream ended before the workflow finished. Check its run logs.")
 
 
