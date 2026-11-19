@@ -168,8 +168,10 @@ def build(provider=DEFAULT_PROVIDER, model=DEFAULT_MODEL):
                          "conditions": [{"id": gate + "_condition", "variable_selector": [dispatch, "route"],
                                          "varType": "string", "comparison_operator": "is", "value": "return"}]}])
             connect(dispatch, gate)
+        # Dify Cloud requires unique public output names across all end nodes.
+        output_name = "result_json" if idx == 1 else f"result_json_{idx}"
         node(end, "end", "Return checked result" if idx < MAX_ROUNDS else "Return checked result or hold",
-             x + 640, 240, outputs=[{"variable": "result_json", "value_type": "string",
+             x + 640, 240, outputs=[{"variable": output_name, "value_type": "string",
                                     "value_selector": [dispatch, "result_json"]}])
         connect(gate if idx < MAX_ROUNDS else dispatch, end, "true" if idx < MAX_ROUNDS else "source")
         state_from, route_from, route_handle = dispatch, gate, "false"

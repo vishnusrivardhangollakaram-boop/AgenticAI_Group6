@@ -7,7 +7,7 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import urlsplit
 from urllib.request import HTTPRedirectHandler, Request, build_opener
 
-from engine import verify_remote
+from engine import MAX_ROUNDS, verify_remote
 from fixtures import CASES
 
 
@@ -16,6 +16,7 @@ MAX_RESPONSE_BYTES = 1_000_000
 MAX_STREAM_BYTES = 8_000_000
 READ_TIMEOUT_SECONDS = 35
 RUN_TIMEOUT_SECONDS = 120
+RESULT_OUTPUT_NAMES = ("result_json", *(f"result_json_{i}" for i in range(2, MAX_ROUNDS + 1)))
 
 
 class RejectRedirects(HTTPRedirectHandler):
@@ -122,6 +123,23 @@ def _call_workflow(url, key, payload):
     return _read_json(body)
 
 
+def _result_json(outputs):
+    """Only one terminal branch may supply an authoritative case result."""
+    if not isinstance(outputs, dict):
+        raise ValueError("The published workflow did not return its result outputs.")
+    results = []
+    for name in RESULT_OUTPUT_NAMES:
+        candidate = outputs.get(name)
+        if candidate is None or (isinstance(candidate, str) and not candidate.strip()):
+            continue
+        if not isinstance(candidate, str):
+            raise ValueError("The published workflow result must be a JSON string.")
+        results.append(candidate)
+    if len(results) != 1:
+        raise ValueError("The published workflow must return exactly one populated result output.")
+    return results[0]
+
+
 def run_dify(case_id, base_url, api_key, user):
     """Run the published LLM workflow and verify decisions against local evidence."""
     if case_id not in CASES:
@@ -140,11 +158,9 @@ def run_dify(case_id, base_url, api_key, user):
     data = response.get("data")
     if not isinstance(data, dict) or data.get("status") != "succeeded":
         raise ValueError("The Dify workflow did not complete. Check its run logs.")
-    outputs = data.get("outputs")
-    if not isinstance(outputs, dict) or not isinstance(outputs.get("result_json"), str):
-        raise ValueError("The published workflow must return a result_json string.")
+    raw_result = _result_json(data.get("outputs"))
     try:
-        result = json.loads(outputs["result_json"])
+        result = json.loads(raw_result)
         if not isinstance(result, dict):
             raise ValueError
         checked = verify_remote(case_id, result)

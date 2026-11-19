@@ -1606,7 +1606,7 @@ workflow:
         selected: false
         version: '1'
         outputs:
-        - variable: result_json
+        - variable: result_json_2
           value_type: string
           value_selector:
           - dispatch_2
@@ -2171,7 +2171,7 @@ workflow:
         selected: false
         version: '1'
         outputs:
-        - variable: result_json
+        - variable: result_json_3
           value_type: string
           value_selector:
           - dispatch_3
@@ -2736,7 +2736,7 @@ workflow:
         selected: false
         version: '1'
         outputs:
-        - variable: result_json
+        - variable: result_json_4
           value_type: string
           value_selector:
           - dispatch_4
@@ -3301,7 +3301,7 @@ workflow:
         selected: false
         version: '1'
         outputs:
-        - variable: result_json
+        - variable: result_json_5
           value_type: string
           value_selector:
           - dispatch_5
@@ -3866,7 +3866,7 @@ workflow:
         selected: false
         version: '1'
         outputs:
-        - variable: result_json
+        - variable: result_json_6
           value_type: string
           value_selector:
           - dispatch_6
@@ -4400,7 +4400,7 @@ workflow:
         selected: false
         version: '1'
         outputs:
-        - variable: result_json
+        - variable: result_json_7
           value_type: string
           value_selector:
           - dispatch_7

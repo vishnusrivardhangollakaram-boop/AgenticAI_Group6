@@ -3,7 +3,7 @@
 ## Verified locally
 
 - **12 application, engine and evaluation tests:** includes notice precedence, evidence access, current notice citations, shortlist review and reset, a review that survives safe rechecks, and tests that catch false readiness or missed review.
-- **6 Dify workflow and API tests:** exercise the exact exported node functions on all 17 synthetic cases, alternate lookup orders, invalid planner output, mocked API output and truncated or failed streams.
+- **8 Dify workflow and API tests:** exercise the exact exported node functions on all 17 synthetic cases, alternate lookup orders, invalid planner output, unique terminal output names, ambiguous terminal results, mocked API output and truncated or failed streams.
 - **Offline evaluation:** each controller returned the expected outcome, notice versions, deadline and review routing on 14/14 scored cases. Fixed checklist used 46 accepted lookups. Optimized rules and adaptive simulation used 43 each. No unsupported ready result, missed escalation or execution error occurred.
 - **Human review tests:** accepted, rejected and request-more-evidence cases passed 3/3.
 - **Offline storyboard:** the embedded synthetic snapshots come from the same engine. Browser-script interactions were exercised with a local document simulator.

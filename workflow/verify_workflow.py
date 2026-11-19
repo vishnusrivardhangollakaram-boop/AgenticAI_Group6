@@ -15,8 +15,8 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from dify_client import _read_workflow_stream, run_dify
-from engine import choose_adaptive, verify_remote
+from dify_client import RESULT_OUTPUT_NAMES, _read_workflow_stream, run_dify
+from engine import MAX_ROUNDS, choose_adaptive, verify_remote
 from fixtures import CASES
 
 
@@ -66,7 +66,7 @@ def offline_workflow(case_id, planner):
             handle = "true" if value(condition["variable_selector"]) == condition["value"] else "false"
         elif kind == "end":
             output = spec["outputs"][0]
-            assert output["variable"] == "result_json"
+            assert output["variable"] == RESULT_OUTPUT_NAMES[executions - 1]
             return json.loads(value(output["value_selector"])), executions
         else:
             raise AssertionError(f"Unhandled exported node type: {kind}")
@@ -85,6 +85,14 @@ def adaptive_stub(case_id):
 
 
 class WorkflowExportTest(unittest.TestCase):
+    def test_export_has_unique_end_output_names_for_publish(self):
+        nodes, _ = nodes_and_edges()
+        ends = [node for node in nodes.values() if node["type"] == "end"]
+        names = [node["outputs"][0]["variable"] for node in ends]
+        self.assertEqual(len(ends), MAX_ROUNDS)
+        self.assertEqual(names, list(RESULT_OUTPUT_NAMES))
+        self.assertEqual(len(set(names)), MAX_ROUNDS)
+
     def test_all_synthetic_cases_reach_verified_output(self):
         for case_id, case in CASES.items():
             with self.subTest(case=case_id):
@@ -129,6 +137,30 @@ class WorkflowExportTest(unittest.TestCase):
         with patch("dify_client._call_workflow", return_value=reply):
             with self.assertRaisesRegex(ValueError, "trusted case evidence"):
                 run_dify("PC-102", "https://api.dify.ai/v1", "test", "fixture-user")
+
+    def test_api_adapter_accepts_numbered_ends_and_rejects_ambiguous_outputs(self):
+        case_id = "PC-103"
+        result, calls = offline_workflow(case_id, adaptive_stub(case_id))
+        encoded = json.dumps(result)
+        key = RESULT_OUTPUT_NAMES[calls - 1]
+        self.assertNotEqual(key, "result_json")
+        outputs = dict.fromkeys(RESULT_OUTPUT_NAMES)
+        outputs["result_json"] = " "
+        outputs[key] = encoded
+        reply = {"data": {"status": "succeeded", "outputs": outputs}}
+        with patch("dify_client._call_workflow", return_value=reply):
+            checked = run_dify(case_id, "https://api.dify.ai/v1", "test", "fixture-user")
+            self.assertEqual(checked["outcome"], "needs_review")
+            outputs["result_json"] = encoded
+            with self.assertRaisesRegex(ValueError, "exactly one populated"):
+                run_dify(case_id, "https://api.dify.ai/v1", "test", "fixture-user")
+            outputs["result_json"] = None
+            outputs[key] = ""
+            with self.assertRaisesRegex(ValueError, "exactly one populated"):
+                run_dify(case_id, "https://api.dify.ai/v1", "test", "fixture-user")
+            outputs[key] = {"unexpected": "object"}
+            with self.assertRaisesRegex(ValueError, "JSON string"):
+                run_dify(case_id, "https://api.dify.ai/v1", "test", "fixture-user")
 
     def test_stream_uses_only_terminal_output(self):
         result, _ = offline_workflow("PC-103", adaptive_stub("PC-103"))

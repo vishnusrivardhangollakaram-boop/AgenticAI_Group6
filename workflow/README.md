@@ -21,7 +21,7 @@ The placement officer’s review and resumed evaluation run within Streamlit. Th
 ## Service API contract
 
 - Request: `POST /v1/workflows/run` with `inputs.case_id`, `response_mode: streaming`, and a short pseudonymous `user`.
-- Response: the final `workflow_finished` event's `data.outputs.result_json` contains a JSON-encoded case result. The client also records the run ID and token count when Dify reports them. Streaming keeps the connection open during the bounded planner loop. The app displays the result after verification.
+- Response: the final `workflow_finished` event's `data.outputs` contains the JSON-encoded case result in exactly one of `result_json`, `result_json_2`, …, `result_json_7`. The name identifies the terminal planner round. Missing, null, and blank values on unused branches are ignored. Distinct end output names satisfy Dify Cloud’s publish validation, and the client rejects ambiguous output. The client also records the run ID and token count when Dify reports them. Streaming keeps the connection open during the bounded planner loop. The app displays the result after verification.
 - A model request, runtime, or configuration error stays visible as an error. It does not trigger a hidden simulation run.
 
 See [Dify Run Workflow](https://docs.dify.ai/en/api-reference/workflow-runs/run-workflow), [Dify streaming](https://docs.dify.ai/en/api-reference/guides/streaming), and the [Gemini API model list](https://ai.google.dev/gemini-api/docs/models).

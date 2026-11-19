@@ -6,7 +6,7 @@ The two-workspace design draws on Student360. This project contains independent 
 
 ## Start the demo
 
-**Hosted demo:** [Open Placement Application Copilot](https://placement-copilot-group6.streamlit.app/). The published app was verified in Case simulation mode, including notice precedence and the officer decision. Live Dify requires a published workflow and server-side credentials.
+**Hosted demo:** [Open Placement Application Copilot](https://placement-copilot-group6.streamlit.app/). The published app was verified in Case simulation mode, including notice precedence and the officer decision. The [published Dify workflow](https://udify.app/workflow/bmkjQivJGTtu816q) was also smoke-tested. Connecting live mode inside Streamlit requires separate server-side credentials. See the [deployment evidence](docs/deployment-status.md).
 
 - **Fastest:** Open `demo/Placement_Copilot_Offline_Demo.html` directly in a browser. It shows precomputed synthetic evidence and the officer decision path. It needs no accounts, network, or Python.
 - **Interactive project:** Run Streamlit from the project folder with Python 3.11 or later. The default simulation is local and offers the complete case review.
