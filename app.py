@@ -1,6 +1,8 @@
 """Student and placement office workspaces over the same synthetic placement case."""
+from base64 import b64encode
 from collections import Counter
 from datetime import datetime, timezone
+from functools import lru_cache
 from hashlib import sha256
 from html import escape
 import json
@@ -25,6 +27,11 @@ OUTCOMES = {
     "missing_evidence": ("Evidence needed", "gold"),
     "closed": ("Application closed", "rust"),
     "incomplete": ("Check incomplete", "gold"),
+}
+MODE_DESCRIPTIONS = {
+    LIVE: "The published workflow chooses which evidence to check.",
+    OFFLINE: "Walk through the same fictional cases locally.",
+    BASELINE: "Run a fixed sequence of evidence checks.",
 }
 DECISIONS = {
     "Verify as equivalent": "equivalent",
@@ -52,23 +59,61 @@ def safe(value):
     return escape(str(value))
 
 
+@lru_cache(maxsize=2)
+def hero_photo(workspace):
+    photo = ROOT / "assets" / f"{workspace}-hero.webp"
+    return "data:image/webp;base64," + b64encode(photo.read_bytes()).decode("ascii")
+
+
+def render_hero(workspace, label, title, lead, *, compact=False):
+    photo = (
+        f'<div class="hero-image"><img src="{hero_photo(workspace)}" alt=""></div>'
+        if workspace in {"student", "office"}
+        else ""
+    )
+    st.html(f"""
+      <section class="workspace-hero {workspace}-hero{' hero-compact' if compact else ''}">
+        <div class="hero-copy">
+          <span class="hero-kicker">{safe(label)}</span>
+          <h1>{safe(title)}</h1>
+          <p class="hero-lead">{safe(lead)}</p>
+        </div>
+        {photo}
+      </section>
+    """)
+
+
+def section_title(title):
+    st.html(f'<div class="flow-heading"><h2>{safe(title)}</h2></div>')
+
+
+def render_stats(items):
+    blocks = []
+    for label, value, detail in items:
+        subtitle = f"<small>{safe(detail)}</small>" if detail else ""
+        blocks.append(f'<div class="stat-block"><span>{safe(label)}</span><strong>{safe(value)}</strong>{subtitle}</div>')
+    st.html('<div class="stats-grid">' + "".join(blocks) + "</div>")
+
+
 def outcome_badge(outcome):
     title, tone = OUTCOMES.get(outcome, ("Awaiting check", "neutral"))
     return (f'<span class="status-tag status-{tone}"><span aria-hidden="true">'
             f'●</span> {title}</span>')
 
 
-def stage_summary(result):
-    """Format one assessment without relying on arbitrary LLM HTML."""
-    deadline = result.get("deadline")
-    deadline_copy = f'<small>Due {safe(deadline)}</small>' if deadline else ""
+def role_tile(case_id, result=None):
+    role = CASES[case_id]
+    deadline = result.get("deadline") if result else None
+    deadline_copy = f'<small>Due {safe(deadline.partition(",")[0])}</small>' if deadline else ""
+    outcome = result["outcome"] if result else None
+    _, tone = OUTCOMES.get(outcome, ("Awaiting check", "neutral"))
     return f"""
-      <div class="role-tile">
-        <strong>{safe(CASES[result["case_id"]]["role_title"])}</strong>
-        <p>{safe(CASES[result["case_id"]]["employer"])}</p>
-        {outcome_badge(result["outcome"])}
+      <article class="role-tile role-{tone}">
+        <span class="role-code">{safe(role["employer"])}</span>
+        <strong>{safe(role["role_title"])}</strong>
+        {outcome_badge(outcome)}
         {deadline_copy}
-      </div>
+      </article>
     """
 
 
@@ -125,11 +170,12 @@ def render_sources(result):
     for source in sources:
         status = str(source.get("status", "")).lower()
         revision = source.get("revision")
-        metadata = " / ".join(str(part) for part in [source.get("id"), revision, status.title()] if part)
+        metadata = f'{source.get("id", "Placement record")} · Revision {revision}' if revision else source.get("id", "")
         superseded = " reference-archived" if status in {"superseded", "archived"} else ""
+        status_label = f"<span>{safe(status.replace('_', ' ').title())}</span>" if status else ""
         st.html(f"""
           <div class="reference{superseded}">
-            <small>{safe(metadata)}</small>
+            <div class="source-meta"><small>{safe(metadata)}</small>{status_label}</div>
             <strong>{safe(source.get("title", "Placement record"))}</strong>
             <p>{safe(source.get("text", ""))}</p>
           </div>
@@ -183,78 +229,57 @@ if "run_mode" not in state:
 if "office_reviews" not in state:
     state.office_reviews = {}
 
-st.html("""
-  <header class="mast">
-    <div class="mast-top"><span class="mast-icon" aria-hidden="true">▥</span>
-      <div><div class="mast-brand">Campus Careers</div><div class="mast-brand-note">PLACEMENT DESK</div></div>
-      <div class="demo-mark"><span aria-hidden="true">●</span> CLASSROOM DEMO</div>
-    </div>
-    <div class="mast-inner">
-      <div><p class="mast-kicker">YOUR NEXT APPLICATION</p>
-      <h1>Placement Application Copilot</h1>
-      <p class="mast-lead">See which roles you can apply for, which notice governs each decision, and what the placement office needs to verify.</p></div>
-      <div class="mast-side"><span>ONE SHORTLIST, THREE OUTCOMES</span>
-       <strong>Apply, check the rule, or ask the office.</strong>
-       <small>The current notice appears with each assessment.</small>
-      </div>
-    </div>
+st.html(f"""
+  <header class="brandbar">
+    <span class="brandmark" aria-hidden="true">P</span>
+    <div class="brand-wordmark"><strong>Placement Copilot</strong><small>Campus Careers</small></div>
+    <span class="brand-status">
+      <span class="connection-dot{' is-connected' if api_key else ''}" aria-hidden="true"></span>
+      {'Dify available' if api_key else 'Simulation available'}
+    </span>
+    <span class="demo-label">Classroom demo</span>
   </header>
 """)
 
-with st.expander("90-second demo guide"):
-    st.markdown(
-        "1. Run **Check my shortlist**. Compare the three outcomes.\n"
-        "2. Open **Business Analyst** and inspect the 12 → 24 month amendment.\n"
-        "3. In **Placement office**, resolve the capstone question for **AI Strategy Associate**. "
-        "Return to the shortlist to see the new result."
-    )
-    if st.button("Reset classroom demo"):
-        state.reports = {}
-        state.office_reviews = {}
-        state.run_mode = None
-        state.generation += 1
-        state.pop("office_message", None)
-        state.pop("run_errors", None)
-        st.rerun()
-
 tabs = st.tabs(["Student workspace", "Placement office", "Evaluation"])
 
-
 with tabs[0]:
+    hero = st.empty()
+
+    def show_student_hero():
+        with hero.container():
+            render_hero(
+                "student", "Student workspace", "Placement Application Copilot",
+                "Check which campus roles you can apply for and see the rule behind each decision.",
+                compact=bool(state.reports),
+            )
+
+    show_student_hero()
     rail, workspace = st.columns([1, 2.4], gap="large")
     student = DEMO_PROFILE["student_name"]
     initials = "".join(part[0] for part in student.split()[:2])
     with rail:
-        st.html(f"""
-          <section class="profile">
-            <small class="sub-label">STUDENT PROFILE</small>
-            <div class="profile-person"><span class="avatar">{safe(initials)}</span>
-            <div><strong>{safe(student)}</strong><span>Sample MBA candidate</span></div></div>
-            <dl>
-              <div><dt>CGPA</dt><dd>{safe(DEMO_PROFILE["cgpa"])} / {safe(DEMO_PROFILE["cgpa_scale"])}</dd></div>
-              <div><dt>Experience</dt><dd>{safe(DEMO_PROFILE["experience_months"])} months</dd></div>
-              <div><dt>Coursework</dt><dd>{safe(DEMO_PROFILE["capstone"])} · {safe(DEMO_PROFILE["capstone_credits"])} credits</dd></div>
-            </dl>
-          </section>
-        """)
-        scope = st.selectbox(
-            "What would you like to check?",
-            ["all", *DEMO_CASES],
-            format_func=lambda key: "Which open campus roles can I apply for?"
-            if key == "all" else f"Can I apply for {CASES[key]['role_title']}?",
-        )
-        modes = [OFFLINE, BASELINE] + ([LIVE] if api_key else [])
-        mode = st.radio("Run mode", modes, index=2 if api_key else 0, key="selected_run_mode")
-        st.caption({
-            OFFLINE: "Offline simulation with synthetic records.",
-            BASELINE: "Offline comparison with fixed checks.",
-            LIVE: "The published Dify workflow chooses its evidence lookups.",
-        }[mode])
-        if st.button("Check my shortlist", type="primary", width="stretch"):
-            latest = {}
-            failures = []
-            with st.spinner("Checking role notices and profile evidence…"):
-                for case_id in (DEMO_CASES if scope == "all" else [scope]):
+        with st.container(border=True, key="run_form"):
+            section_title("Check eligibility")
+            scope = st.selectbox(
+                "Roles to check",
+                ["all", *DEMO_CASES],
+                format_func=lambda key: "All campus roles" if key == "all" else CASES[key]["role_title"],
+            )
+            modes = [OFFLINE, BASELINE] + ([LIVE] if api_key else [])
+            with st.expander("Run settings"):
+                mode = st.radio("Run mode", modes, index=2 if api_key else 0, key="selected_run_mode")
+                st.caption(MODE_DESCRIPTIONS[mode])
+            if st.button("Check my shortlist", type="primary", width="stretch"):
+                latest = {}
+                failures = []
+                case_ids = DEMO_CASES if scope == "all" else (scope,)
+                progress = st.empty()
+                for index, case_id in enumerate(case_ids, start=1):
+                    progress.progress(
+                        (index - 1) / len(case_ids),
+                        text=f"Checking {CASES[case_id]['role_title']} · {index} of {len(case_ids)}",
+                    )
                     try:
                         checked = (
                             run_dify(case_id, base_url, api_key, state.visitor)
@@ -264,43 +289,60 @@ with tabs[0]:
                         latest[case_id] = apply_review(checked, state.office_reviews.get(case_id))
                     except ValueError as error:
                         failures.append(f"{CASES[case_id]['role_title']}: {error}")
-            state.reports = latest
-            state.pop("office_message", None)
-            state.run_mode = mode
-            state.generation += 1
-            state.run_errors = failures
-        st.caption("Sample profile and notices only. Students submit applications through their campus process.")
-        st.caption(f"Case snapshot · {datetime.fromisoformat(AS_OF).strftime('%d %b %Y, %H:%M')} IST")
+                progress.empty()
+                resize_hero = bool(latest) != bool(state.reports)
+                state.reports = latest
+                state.pop("office_message", None)
+                state.run_mode = mode
+                state.generation += 1
+                state.run_errors = failures
+                if resize_hero:
+                    show_student_hero()
+        with st.expander("Sample student profile", expanded=not bool(state.reports)):
+            st.html(f"""
+              <section class="profile">
+                <div class="profile-person"><span class="avatar" aria-hidden="true">{safe(initials)}</span>
+                <div><strong>{safe(student)}</strong><span>Sample MBA candidate</span></div></div>
+                <dl>
+                  <div><dt>CGPA</dt><dd>{safe(DEMO_PROFILE["cgpa"])} / {safe(DEMO_PROFILE["cgpa_scale"])}</dd></div>
+                  <div><dt>Experience</dt><dd>{safe(DEMO_PROFILE["experience_months"])} months</dd></div>
+                  <div><dt>Coursework</dt><dd>{safe(DEMO_PROFILE["capstone"])} · {safe(DEMO_PROFILE["capstone_credits"])} credits</dd></div>
+                </dl>
+              </section>
+            """)
 
     with workspace:
-        st.subheader("Your application shortlist")
+        section_title("Your application shortlist")
         reports = state.reports
         if state.get("run_errors"):
             for error in state.run_errors:
                 st.error(error)
         if reports:
             counts = Counter(r["outcome"] for r in reports.values())
-            st.caption(f"{state.run_mode} · {len(reports)} role checks · {counts['ready']} ready · "
-                       f"{counts['needs_review']} awaiting office review")
+            st.caption(f"Latest run · {state.run_mode}")
+            render_stats((
+                ("Roles checked", len(reports), None),
+                ("Ready to apply", counts["ready"], None),
+                ("Awaiting office review", sum(r["review_required"] for r in reports.values()), None),
+            ))
             st.html(
-                '<div class="role-grid">' + "".join(stage_summary(reports[c]) for c in DEMO_CASES if c in reports) + '</div>'
+                '<div class="role-grid">' + "".join(role_tile(c, reports[c]) for c in DEMO_CASES if c in reports) + '</div>'
             )
             visited = [case for case in DEMO_CASES if case in reports]
             case_id = st.selectbox(
                 "Inspect an application", visited, format_func=lambda key: CASES[key]["role_title"]
             )
             result = reports[case_id]
-            with st.container(border=True):
+            with st.container(border=True, key="role_assessment"):
                 st.html(f"""
                   <div class="assessment-heading">
-                    <small class="sub-label">{safe(case_id)} / ROLE ASSESSMENT</small>
+                    <small class="sub-label">{safe(CASES[case_id]["employer"])} · {safe(case_id)}</small>
                     <h3>{safe(CASES[case_id]["role_title"])}</h3>
                     {outcome_badge(result["outcome"])}
                     <p>{safe(result["summary"])}</p>
                   </div>
                 """)
-                st.markdown("**Next step**")
-                st.write(result["next_action"])
+                st.html(f'<div class="next-action"><strong>Next step</strong><p>{safe(result["next_action"])}</p></div>')
                 if result.get("deadline"):
                     st.caption(f"Application deadline · {result['deadline']}")
                 render_notice_comparison(result)
@@ -327,38 +369,44 @@ with tabs[0]:
             )
         else:
             st.html(
-                '<p class="workspace-hint">Run a check to compare one student profile against three role notices.</p>'
-                '<div class="role-grid">' + "".join(
-                    f'<div class="role-tile role-queued"><strong>{safe(CASES[key]["role_title"])}</strong>'
-                    '<p>Awaiting a profile and notice check</p></div>' for key in DEMO_CASES
-                ) + '</div>'
-                '<div class="empty-note"><strong>See the rule behind each outcome</strong>'
-                '<p>The shortlist shows current notices, earlier revisions, and any question the office needs to resolve.</p></div>'
+                '<div class="role-grid">' + "".join(role_tile(key) for key in DEMO_CASES) + '</div>'
             )
+            st.html('<div class="empty-note"><strong>Start with a shortlist check</strong>'
+                    '<p>See the current notice, any revisions, and what the placement office needs to verify.</p></div>')
 
 with tabs[1]:
-    st.html("""
-      <div class="office-heading">
-        <small class="sub-label">STAFF WORKSPACE</small>
-        <h2>Placement office review</h2>
-        <p>Resolve evidence that a role notice and student profile cannot settle by themselves.</p>
-      </div>
-    """)
+    render_hero(
+        "office", "Staff workspace", "Placement office review",
+        "Review referred cases and record the evidence that resolves them.",
+        compact=bool(state.reports),
+    )
     pending = [key for key, result in state.reports.items() if result["review_required"]]
     completed = [key for key, result in state.reports.items() if result.get("review")]
     queue, body = st.columns([1, 2.4], gap="large")
     with queue:
-        st.metric("Pending review", len(pending))
-        st.metric("Recorded responses", len(completed))
-        st.caption("Reviews persist across checks in this browser session. Reset the demo to clear them.")
+        section_title("Review inbox")
+        render_stats((("Pending review", len(pending), None), ("Recorded responses", len(completed), None)))
+        st.html('<div class="office-context">Demo decisions apply to this browser session.</div>')
     with body:
-        if not pending:
-            st.info("No cases await an office decision. Check the shortlist in the student workspace to populate the inbox.")
+        section_title("Case review")
+        if state.get("office_message"):
+            st.success(state.office_message)
+        if not pending and not completed:
+            st.html('<div class="empty-note"><strong>No cases await an office decision</strong>'
+                    '<p>Run the shortlist in the Student workspace to see whether a case needs review.</p></div>')
+        elif not pending:
+            st.caption("No further cases await a decision.")
         else:
             case_id = st.selectbox("Select an open review", pending, format_func=lambda case: CASES[case]["role_title"])
             result = state.reports[case_id]
-            st.markdown(f"### {safe(CASES[case_id]['role_title'])}")
-            st.write(result["summary"])
+            st.html(f"""
+              <div class="assessment-heading">
+                <small class="sub-label">{safe(CASES[case_id]["employer"])} · {safe(case_id)}</small>
+                <h3>{safe(CASES[case_id]["role_title"])}</h3>
+                {outcome_badge(result["outcome"])}
+                <p>{safe(result["summary"])}</p>
+              </div>
+            """)
             with st.expander("Evidence sent with the review", expanded=True):
                 render_sources(result)
                 with st.expander("Investigation timeline"):
@@ -388,27 +436,27 @@ with tabs[1]:
                                 "The student shortlist now reflects this decision."
                             )
                             st.rerun()
-        if state.get("office_message"):
-            st.success(state.office_message)
+        if completed:
+            st.subheader("Recorded decisions")
         for case_id in completed:
             st.markdown(f"**{CASES[case_id]['role_title']}**")
             render_review_note(state.reports[case_id])
 
 with tabs[2]:
-    st.subheader("Evaluation")
-    st.caption(
-        "These results compare offline controllers on an identical synthetic case set. "
-        "Published Dify runs require a separate live evaluation."
+    render_hero(
+        "evaluation", "Synthetic benchmark", "Evaluation",
+        "Compare the offline controllers on the same 14 synthetic cases. Live Dify performance is measured separately.",
+        compact=True,
     )
+    section_title("Controller comparison")
     rows, scores = evaluate_offline()
-    columns = st.columns(len(scores))
-    for column, (label, result) in zip(columns, scores.items()):
-        column.metric(str(label), f"{result['correct']} / {result['cases']}", f"{result['lookups']} tool lookups",
-                      delta_color="off")
-        column.caption(f"{result['unsupported_ready']} unsupported ready verdicts")
-        if "notices_correct" in result:
-            column.caption(f"{result['notices_correct']} correct notice selections · "
-                           f"{result['missed_escalations']} missed escalations")
+    render_stats([
+        (label, f"{result['correct']} / {result['cases']} correct",
+         f"{result['lookups']} tool lookups · {result['unsupported_ready']} unsupported ready decisions. "
+         f"{result['notices_correct']} correct notice selections · {result['missed_escalations']} missed escalations.")
+        for label, result in scores.items()
+    ])
+    section_title("Case-by-case results")
     st.dataframe(
         rows,
         hide_index=True,
@@ -421,3 +469,27 @@ with tabs[2]:
         file_name="placement-evaluation-offline.json",
         mime="application/json",
     )
+
+with st.expander("90-second demo guide"):
+    st.markdown(
+        "1. Run **Check my shortlist** and compare the three outcomes.\n"
+        "2. Inspect **Business Analyst** for the 12 → 24 month amendment.\n"
+        "3. In **Placement office**, resolve the capstone question for **AI Strategy Associate**. "
+        "Return to the shortlist to see the updated result."
+    )
+    if st.button("Reset classroom demo"):
+        state.reports = {}
+        state.office_reviews = {}
+        state.run_mode = None
+        state.generation += 1
+        state.pop("office_message", None)
+        state.pop("run_errors", None)
+        st.rerun()
+
+snapshot_date = datetime.fromisoformat(AS_OF).strftime("%d %b %Y, %H:%M IST")
+st.html(f"""
+  <footer class="support-footer">
+    <span>Fictional profiles and role notices</span>
+    <span>Case snapshot · {safe(snapshot_date)}</span>
+  </footer>
+""")

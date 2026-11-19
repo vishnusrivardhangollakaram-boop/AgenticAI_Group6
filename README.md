@@ -2,11 +2,11 @@
 
 Which campus roles can I apply for, and what is blocking me? The student workspace checks current role notices and verified profile facts. The placement office workspace reviews ambiguities and updates the same shortlist. The examples are fictional.
 
-The two-workspace design draws on Student360. This project contains independent code, notices and case data.
+The design draws on Student360's distinct student and staff workspaces and TaleTwinkle's focus on a single clear starting action. The Student workspace pairs eligibility checks with a live shortlist, while the navy Placement office workspace separates referred cases from recorded decisions. The project uses its own code, fictional campus photography, notices and case data.
 
 ## Start the demo
 
-**Hosted demo:** [Open Placement Application Copilot](https://placement-copilot-group6.streamlit.app/). The published app was verified in Case simulation mode, including notice precedence and the officer decision. The [published Dify workflow](https://udify.app/workflow/bmkjQivJGTtu816q) was also smoke-tested. Connecting live mode inside Streamlit requires separate server-side credentials. See the [deployment evidence](docs/deployment-status.md).
+**Hosted demo:** [Open Placement Application Copilot](https://placement-copilot-group6.streamlit.app/). The hosted app connects to the [published Dify workflow](https://udify.app/workflow/bmkjQivJGTtu816q). Use **Run settings** to choose **Dify agent**, **Case simulation**, or **Fixed checklist**. Use Case simulation to run the demo without a model call. See the [deployment evidence](docs/deployment-status.md).
 
 - **Fastest:** Open `demo/Placement_Copilot_Offline_Demo.html` directly in a browser. It shows precomputed synthetic evidence and the officer decision path. It needs no accounts, network, or Python.
 - **Interactive project:** Run Streamlit from the project folder with Python 3.11 or later. The default simulation is local and offers the complete case review.
